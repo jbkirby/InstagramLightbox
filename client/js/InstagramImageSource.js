@@ -23,28 +23,32 @@ export default class InstagramImageSource extends ImageSource {
 		});
 	}
 
-	getImages() {
-		// Include 'callback' query parameter to force JSONP
-		const URL = 'https://api.instagram.com/v1/users/self/media/recent/?access_token=' + this.accessToken + '&count=10&callback=?';
-
+	getImages(url) {
 		return new Promise( (resolve, reject) => {
-			$.getJSON(URL, (results, status) => {
+			$.getJSON(url, (results, status) => {
 				if(status !== 'success') return reject(status);
 
-				// console.log('raw result from IG: ' + JSON.stringify(results, null, 4));
+				console.log('raw result from IG: ' + JSON.stringify(results, null, 4));
 
-				let images = results.data.map( data => {
+				let imageArray = results.data.map( data => {
 					return {
-						// pagination : data.pagination,
 						image : {
 							standard : data.images.standard_resolution,
 							thumbnail : data.images.thumbnail
-						}//,
-						// caption : data.caption.text
+						},
+						caption : data.caption ? data.caption.text : ""
 					}
 				});
 
-				return resolve(images);
+				let nextPageUrl = results.pagination.next_url;
+				if(nextPageUrl !== null) {
+					nextPageUrl = nextPageUrl.replace(/callback=(\w+)/, 'callback=?');
+				}
+
+				return resolve({
+					imageArray,
+					nextPageUrl
+				});
 			});
 		});
 	}
