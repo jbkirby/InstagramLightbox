@@ -4,11 +4,12 @@ import InstagramImageSource from './InstagramImageSource';
 
 const INSTAGRAM_CLIENT_ID = '54cf06a9c7fa4584b9008927c8721b41';
 const URL = url.parse(window.location.href);
+
+// TODO move this into instagram module
 const INSTAGRAM_AUTH_URL = 'https://api.instagram.com/oauth/authorize/?client_id=' + INSTAGRAM_CLIENT_ID + '&redirect_uri=' + URL.href + '&response_type=token';
 
 let imageDataSoFar = [];
 let imageSource = null;
-let nextPageUrl = null;
 let curImageIndex = -1;
 
 if(URL.hash === null || !URL.hash.includes('#access_token=')) {
@@ -16,12 +17,7 @@ if(URL.hash === null || !URL.hash.includes('#access_token=')) {
 	window.location = INSTAGRAM_AUTH_URL;
 } else {
 	let accessToken = URL.hash.split('=')[1];
-	console.log('access token is ' + accessToken);
-
 	imageSource = new InstagramImageSource(accessToken);
-
-	// Include 'callback' query parameter to force JSONP
-	nextPageUrl = 'https://api.instagram.com/v1/users/self/media/recent/?access_token=' + accessToken + '&count=2&callback=?';
 
 	Promise.all([
 		updateProfileInfo(),
@@ -61,8 +57,6 @@ function attachListeners() {
 function updateProfileInfo() {
 	return imageSource.getProfileInfo()
 	.then(result => {
-		console.log('image source returned ' + JSON.stringify(result, null, 4));
-
 		$('#user_name').text(result.name);
 		$('#profile_picture').attr('src', result.profilePictureUrl);
 	});
@@ -70,17 +64,16 @@ function updateProfileInfo() {
 
 function loadMoreImages() {
 	// If we don't have a URL from which to load more images, nothing to do.
-	if(nextPageUrl === null) return Promise.resolve();
+	if(!imageSource.canLoadMoreImages()) return Promise.resolve();
 
-	return imageSource.getImages(nextPageUrl)
+	return imageSource.getImages()
 	.then(results =>{
-		imageDataSoFar = imageDataSoFar.concat(results.imageArray);
-		nextPageUrl = results.nextPageUrl;
+		imageDataSoFar = imageDataSoFar.concat(results);
 
 		if(curImageIndex < 0 && imageDataSoFar.length > 0) {
 			// Display the first image
 			curImageIndex = 0;
-			return showPhoto(curImageIndex);
+			showPhoto(curImageIndex);
 		}
 	});
 }
@@ -88,8 +81,4 @@ function loadMoreImages() {
 function showPhoto(index) {
 	$('#focus_image').attr('src', imageDataSoFar[index].image.standard.url);
 	$('#image_description').text(imageDataSoFar[index].caption);
-}
-
-function showPrevPhoto() {
-
 }

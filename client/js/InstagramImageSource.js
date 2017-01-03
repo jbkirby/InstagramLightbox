@@ -5,6 +5,7 @@ export default class InstagramImageSource extends ImageSource {
 	constructor(accessToken) {
 		super();
 		this.accessToken = accessToken;
+		this.nextPageUrl = 'https://api.instagram.com/v1/users/self/media/recent/?access_token=' + accessToken + '&callback=?';
 	}
 
 	getProfileInfo() {
@@ -23,12 +24,16 @@ export default class InstagramImageSource extends ImageSource {
 		});
 	}
 
-	getImages(url) {
+	canLoadMoreImages() {
+		return this.nextPageUrl !== null;
+	}
+
+	getImages() {
 		return new Promise( (resolve, reject) => {
-			$.getJSON(url, (results, status) => {
+			$.getJSON(this.nextPageUrl, (results, status) => {
 				if(status !== 'success') return reject(status);
 
-				console.log('raw result from IG: ' + JSON.stringify(results, null, 4));
+				// console.log('raw result from IG: ' + JSON.stringify(results, null, 4));
 
 				let imageArray = results.data.map( data => {
 					return {
@@ -40,15 +45,17 @@ export default class InstagramImageSource extends ImageSource {
 					}
 				});
 
-				let nextPageUrl = results.pagination.next_url;
-				if(nextPageUrl !== null) {
-					nextPageUrl = nextPageUrl.replace(/callback=(\w+)/, 'callback=?');
+				let nextUrl = results.pagination.next_url || null;
+
+				// Remove the calculated callback name to avoid Access-Control-Allow-Origin
+				// errors.
+				if(nextUrl !== null) {
+					nextUrl = nextUrl.replace(/callback=(\w+)/, 'callback=?');
 				}
 
-				return resolve({
-					imageArray,
-					nextPageUrl
-				});
+				this.nextPageUrl = nextUrl;
+
+				return resolve(imageArray);
 			});
 		});
 	}
