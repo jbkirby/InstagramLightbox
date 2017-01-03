@@ -1,56 +1,32 @@
 import $ from 'jquery';
-import url from 'url';
 import InstagramImageSource from './InstagramImageSource';
 
-const INSTAGRAM_CLIENT_ID = '54cf06a9c7fa4584b9008927c8721b41';
-const URL = url.parse(window.location.href);
-
-// TODO move this into instagram module
-const INSTAGRAM_AUTH_URL = 'https://api.instagram.com/oauth/authorize/?client_id=' + INSTAGRAM_CLIENT_ID + '&redirect_uri=' + URL.href + '&response_type=token';
-
+let imageSource = new InstagramImageSource();
 let imageDataSoFar = [];
-let imageSource = null;
 let curImageIndex = -1;
 
-if(URL.hash === null || !URL.hash.includes('#access_token=')) {
-	// If no access token specified, redirect to instagram auth page
-	window.location = INSTAGRAM_AUTH_URL;
-} else {
-	let accessToken = URL.hash.split('=')[1];
-	imageSource = new InstagramImageSource(accessToken);
-
+if(imageSource.authorize()) {
 	Promise.all([
 		updateProfileInfo(),
-		loadMoreImages()
+		loadMoreImageDescriptions()
 	]).then(() => {
+		showNextPhoto();
 		attachListeners();
 	});
+} else {
+	// TODO update page UI to indicate authorization failure
+	console.log('not authorized.');
 }
 
 function attachListeners() {
-	$('a#next_link').click(event => {
-		event.preventDefault();
-
-		Promise.resolve()
-		.then(() =>{
-			if(curImageIndex === imageDataSoFar.length - 1) {
-				console.log('loading more images...');
-				return loadMoreImages();
-			}
-		})
-		.then(() => {
-			if(curImageIndex < imageDataSoFar.length - 1) {
-				showPhoto(++curImageIndex);
-			}
-		});
+	$('a#next_link').click(e => {
+		e.preventDefault();
+		showNextPhoto();
 	});
 
-	$('a#prev_link').click(event => {
-		event.preventDefault();
-
-		if(curImageIndex > 0) {
-			showPhoto(--curImageIndex);
-		}
+	$('a#prev_link').click(e => {
+		e.preventDefault();
+		showPrevPhoto();
 	});
 }
 
@@ -62,23 +38,66 @@ function updateProfileInfo() {
 	});
 }
 
-function loadMoreImages() {
-	// If we don't have a URL from which to load more images, nothing to do.
+function loadMoreImageDescriptions() {
 	if(!imageSource.canLoadMoreImages()) return Promise.resolve();
 
 	return imageSource.getImages()
 	.then(results =>{
 		imageDataSoFar = imageDataSoFar.concat(results);
+	});
+}
 
-		if(curImageIndex < 0 && imageDataSoFar.length > 0) {
-			// Display the first image
-			curImageIndex = 0;
-			showPhoto(curImageIndex);
+function showNextPhoto() {
+	Promise.resolve()
+	.then(() => {
+		if(curImageIndex < imageDataSoFar.length - 1) {
+			curImageIndex++;
+			showImage(curImageIndex);
+			updateNavButtons();
+		}
+
+		// If we have at least one more image in our cache, preload it
+		if(curImageIndex < imageDataSoFar.length - 1) {
+			preloadImage(curImageIndex + 1);
+		} else {
+			// ...otherwise, ask our ImageSource for more data
+			return loadMoreImageDescriptions()
+			.then(() => {
+				updateNavButtons();
+
+				if(curImageIndex < imageDataSoFar.length - 1) {
+					preloadImage(curImageIndex + 1);
+				}
+			});
 		}
 	});
 }
 
-function showPhoto(index) {
+function showPrevPhoto() {
+	if(curImageIndex > 0) {
+		curImageIndex--;
+
+		showImage(curImageIndex);
+		updateNavButtons();
+	}
+}
+
+function showImage(index) {
 	$('#focus_image').attr('src', imageDataSoFar[index].image.standard.url);
 	$('#image_description').text(imageDataSoFar[index].caption);
+}
+
+function updateNavButtons() {
+	$('#prev_link').toggleClass('hide', curImageIndex === 0);
+	$('#next_link').toggleClass('hide', curImageIndex >= imageDataSoFar.length - 1);
+}
+
+function preloadImage(index) {
+	let imageDescription = imageDataSoFar[index];
+
+	// If we haven't already downloaded the image at index, do it now.
+	if(!imageDescription.image.standard.downloaded) {
+		imageDescription.image.standard.downloaded = new Image();
+		imageDescription.image.standard.downloaded.src = imageDescription.image.standard.url;
+	}
 }

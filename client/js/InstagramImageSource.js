@@ -1,16 +1,42 @@
 import $ from 'jquery';
+import url from 'url';
 import ImageSource from './ImageSource';
 
+// TODO move this to an environment variable
+const INSTAGRAM_CLIENT_ID = '54cf06a9c7fa4584b9008927c8721b41';
+
+const NUM_IMAGES_TO_REQUEST = 5;
+
 export default class InstagramImageSource extends ImageSource {
-	constructor(accessToken) {
+	constructor() {
 		super();
-		this.accessToken = accessToken;
-		this.nextPageUrl = 'https://api.instagram.com/v1/users/self/media/recent/?access_token=' + accessToken + '&callback=?';
+		this.accessToken = null;
+		this.nextPageUrl = null;
+	}
+
+	authorize() {
+		const URL = url.parse(window.location.href);
+		const INSTAGRAM_AUTH_URL = 'https://api.instagram.com/oauth/authorize/?client_id='+ INSTAGRAM_CLIENT_ID
+									+ '&redirect_uri=' + URL.href
+									+ '&response_type=token';
+
+		if(URL.hash === null || !URL.hash.includes('#access_token=')) {
+			// If no access token specified, redirect to instagram auth page
+			window.location = INSTAGRAM_AUTH_URL;
+			return false;
+		} else {
+			this.accessToken = URL.hash.split('=')[1];
+			this.nextPageUrl = 'https://api.instagram.com/v1/users/self/media/recent/?access_token=' + this.accessToken
+								+ '&count=' + NUM_IMAGES_TO_REQUEST
+								+ '&callback=?';
+			return true;
+		}
 	}
 
 	getProfileInfo() {
 		// Include 'callback' query parameter to force JSONP
-		const URL = 'https://api.instagram.com/v1/users/self/?access_token=' + this.accessToken + '&callback=?';
+		const URL = 'https://api.instagram.com/v1/users/self/?access_token=' + this.accessToken
+					+ '&callback=?';
 
 		return new Promise( (resolve, reject) => {
 			$.getJSON(URL, (result, status) => {

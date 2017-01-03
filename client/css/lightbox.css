@@ -18,3 +18,7 @@ div.container {
 #focus_image {
     width: 100%;
 }
+
+.hide {
+   display: none;
+}
