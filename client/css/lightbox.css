@@ -1,18 +1,20 @@
-.myNewStyle {
-   font-family: Verdana, Arial, Helvetica, sans-serif;
-   font-weight: bold;
-   color: #FF0000;
+
+body {
+    margin:25px;
 }
 
-.my2ndNewStyle {
-   font-family: Verdana, Arial, Helvetica, sans-serif;
-   font-weight: bold;
-   color: #FF0000;
+div.lightbox {
+    width: 80%;
+    background-color: white;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    margin-bottom: 25px;
 }
 
-.my3rdNewStyle {
-   font-family: Verdana, Arial, Helvetica, sans-serif;
-   font-weight: bold;
-   font-size: 12pt;
-   color: #FF0000;
+div.container {
+  text-align: center;
+  padding: 10px 20px;
+}
+
+#focus_image {
+    width: 100%;
 }
