@@ -58,7 +58,7 @@ export default class InstagramImageSource {
     getImages() {
         return new Promise( (resolve, reject) => {
             $.getJSON(this.nextPageUrl, (results, status) => {
-                if(status !== 'success' || (results.meta && results.meta !== 200)) {
+                if(status !== 'success' || (results.meta && results.meta.code !== 200)) {
                     return reject(results);
                 }
 
