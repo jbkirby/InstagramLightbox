@@ -38,9 +38,15 @@ function updateProfileInfo() {
 	});
 }
 
+function updateNavButtons() {
+	$('#prev_link').toggleClass('hide', curImageIndex === 0);
+	$('#next_link').toggleClass('hide', curImageIndex >= imageDataSoFar.length - 1);
+}
+
 function loadMoreImageDescriptions() {
 	if(!imageSource.canLoadMoreImages()) return Promise.resolve();
 
+	console.log('loading more image data from API...');
 	return imageSource.getImages()
 	.then(results =>{
 		imageDataSoFar = imageDataSoFar.concat(results);
@@ -57,7 +63,7 @@ function showNextPhoto() {
 		}
 
 		// If we have at least one more image in our cache, preload it
-		if(curImageIndex < imageDataSoFar.length - 1) {
+		if(curImageIndex < imageDataSoFar.length - 2) {
 			preloadImage(curImageIndex + 1);
 		} else {
 			// ...otherwise, ask our ImageSource for more data
@@ -87,16 +93,12 @@ function showImage(index) {
 	$('#image_description').text(imageDataSoFar[index].caption);
 }
 
-function updateNavButtons() {
-	$('#prev_link').toggleClass('hide', curImageIndex === 0);
-	$('#next_link').toggleClass('hide', curImageIndex >= imageDataSoFar.length - 1);
-}
-
 function preloadImage(index) {
 	let imageDescription = imageDataSoFar[index];
 
 	// If we haven't already downloaded the image at index, do it now.
 	if(!imageDescription.image.standard.downloaded) {
+		console.log('preloading ' + index);
 		imageDescription.image.standard.downloaded = new Image();
 		imageDescription.image.standard.downloaded.src = imageDescription.image.standard.url;
 	}
