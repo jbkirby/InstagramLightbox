@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import InstagramImageSource from './InstagramImageSource';
 
 // Interface to the underlying image API, in this case Instagram.
