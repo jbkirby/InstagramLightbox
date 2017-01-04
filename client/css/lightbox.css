@@ -1,32 +1,32 @@
 
 body {
-    margin:25px;
-    position: relative;
     background-color: #7b7c7c;
 }
 
 div.lightbox {
     background-color: white;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-    margin-bottom: 25px;
-    margin-left: 50px;
-    margin-right: 50px;
-    position: relative;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
     max-width: 700px;
 }
 
 div.description-container {
     text-align: center;
-    padding: 10px 20px;
-    min-height: 50px;
+    padding: 10px 10px;
+    min-height: 30px;
 }
 
 div.nav-container {
-    position: absolute;
-    left: 0;
+    position: fixed;
+    left: 50%;
     top: 50%;
     width: 100%;
     max-width: 800px;
+    transform: translate(-50%, -50%);
 }
 
 #focus-image {
