@@ -1,20 +1,23 @@
 
 body {
     margin:25px;
+    position: relative;
+    background-color: #7b7c7c;
 }
 
 div.lightbox {
-    width: 80%;
     background-color: white;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     margin-bottom: 25px;
-    margin: auto;
+    margin-left: 50px;
+    margin-right: 50px;
     position: relative;
 }
 
 div.description_container {
   text-align: center;
   padding: 10px 20px;
+  min-height: 50px;
 }
 
 div.nav_container {
@@ -22,7 +25,7 @@ div.nav_container {
     left: 0;
     top: 50%;
     width: 100%;
-    transform: translate(0, -50%);
+    /*transform: translate(0, -50%);*/
 }
 
 #focus_image {
@@ -39,7 +42,6 @@ div.nav_container a {
     border-bottom:10px solid white;
     width:20px;
     height:20px;
-    margin-top:40px;
 }
 
 div.centered_container {
@@ -53,11 +55,13 @@ div.centered_container {
 #prev_link {
     left: 0;
     border-left:10px solid white;
+    margin-left: 20px;
     transform: rotate(45deg);
 }
 
 #next_link {
     right: 0;
     border-right:10px solid white;
+    margin-right: 20px;
     transform: rotate(-45deg);
 }
