@@ -2,8 +2,8 @@ import url from 'url';
 
 const INSTAGRAM_CLIENT_ID = '54cf06a9c7fa4584b9008927c8721b41';
 
-// Set to 5 to demonstrate multiple API accesses.
-const NUM_IMAGES_TO_REQUEST = 5;
+// NOTE Try setting to 5 to demonstrate multiple API accesses.
+const NUM_IMAGES_TO_REQUEST = 20;
 
 /**
  * Encapsulates the Instagram API. Methods are generalized to allow straightforward
