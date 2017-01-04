@@ -57,6 +57,15 @@ function loadMoreImageInfo() {
 
         // Return just the retrieved info in case it's of use.
         return results;
+    })
+    .catch(err => {
+        // TODO let the user know that something went wrong.
+        // For now, just echo the error to the console with as much info as we have.
+        console.log(
+            err.meta ?
+            JSON.stringify(err.meta, null, 4) :
+            'There was an error retrieving information from the image source API.'
+        );
     });
 }
 

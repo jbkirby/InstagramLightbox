@@ -2,7 +2,7 @@ import url from 'url';
 
 const INSTAGRAM_CLIENT_ID = '54cf06a9c7fa4584b9008927c8721b41';
 
-// NOTE Try setting to 5 to demonstrate multiple API accesses.
+// NOTE Try setting to e.g. 5 to demonstrate multiple API accesses.
 const NUM_IMAGES_TO_REQUEST = 20;
 
 /**
@@ -39,9 +39,9 @@ export default class InstagramImageSource {
         const URL = 'https://api.instagram.com/v1/users/self/?access_token=' + this.accessToken
                     + '&callback=?';
 
-        return new Promise( (resolve, reject) => {
+        return new Promise((resolve, reject) => {
             $.getJSON(URL, (result, status) => {
-                if(status !== 'success') return reject(status);
+                if(status !== 'success') return reject(result);
 
                 return resolve({
                     name : result.data.full_name,
@@ -58,9 +58,11 @@ export default class InstagramImageSource {
     getImages() {
         return new Promise( (resolve, reject) => {
             $.getJSON(this.nextPageUrl, (results, status) => {
-                if(status !== 'success') return reject(status);
+                if(status !== 'success' || (results.meta && results.meta !== 200)) {
+                    return reject(results);
+                }
 
-                let imageArray = results.data.map( data => {
+                let imageArray = results.data.map(data => {
                     return {
                         image : {
                             standard : data.images.standard_resolution,
