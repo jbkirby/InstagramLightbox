@@ -29,12 +29,12 @@ if(imageSource.authorize()) {
 }
 
 function attachListeners() {
-	$('a#next_link').click(e => {
+	$('a#next-link').click(e => {
 		e.preventDefault();
 		showNextPhoto();
 	});
 
-	$('a#prev_link').click(e => {
+	$('a#prev-link').click(e => {
 		e.preventDefault();
 		showPrevPhoto();
 	});
@@ -44,15 +44,15 @@ function attachListeners() {
 function updateProfileInfo() {
 	return imageSource.getProfileInfo()
 	.then(result => {
-		$('#user_name').text(result.name);
-		$('#profile_picture').attr('src', result.profilePictureUrl);
+		$('#user-name').text(result.name);
+		$('#profile-picture').attr('src', result.profilePictureUrl);
 	});
 }
 
 // Hide or reveal nav buttons as appropriate.
 function updateNavButtons() {
-	$('#prev_link').toggleClass('hide', curImageIndex === 0);
-	$('#next_link').toggleClass('hide', curImageIndex >= imageInfo.length - 1);
+	$('#prev-link').toggleClass('hide', curImageIndex === 0);
+	$('#next-link').toggleClass('hide', curImageIndex >= imageInfo.length - 1);
 }
 
 // Request another page of image descriptions from our image source. We're not
@@ -109,8 +109,8 @@ function showPrevPhoto() {
 }
 
 function showImage(index) {
-	$('#focus_image').attr('src', imageInfo[index].image.standard.url);
-	$('#image_description').text(imageInfo[index].caption);
+	$('#focus-image').attr('src', imageInfo[index].image.standard.url);
+	$('#image-description').text(imageInfo[index].caption);
 }
 
 // Load the image at the parameter index in imageInfo, but don't display it yet.
