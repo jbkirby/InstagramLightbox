@@ -11,78 +11,78 @@ const NUM_IMAGES_TO_REQUEST = 5;
  * implementation of compatible classes for other image APIs.
  */
 export default class InstagramImageSource {
-	constructor() {
-		this.accessToken = null;
-		this.nextPageUrl = null;
-	}
+    constructor() {
+        this.accessToken = null;
+        this.nextPageUrl = null;
+    }
 
-	authorize() {
-		const URL = url.parse(window.location.href);
-		const INSTAGRAM_AUTH_URL = 'https://api.instagram.com/oauth/authorize/?client_id='+ INSTAGRAM_CLIENT_ID
-									+ '&redirect_uri=' + URL.href
-									+ '&response_type=token';
+    authorize() {
+        const URL = url.parse(window.location.href);
+        const INSTAGRAM_AUTH_URL = 'https://api.instagram.com/oauth/authorize/?client_id='+ INSTAGRAM_CLIENT_ID
+                                    + '&redirect_uri=' + URL.href
+                                    + '&response_type=token';
 
-		if(URL.hash === null || !URL.hash.includes('#access_token=')) {
-			// If no access token specified, redirect to instagram auth page
-			window.location = INSTAGRAM_AUTH_URL;
-			return false;
-		} else {
-			this.accessToken = URL.hash.split('=')[1];
-			this.nextPageUrl = 'https://api.instagram.com/v1/users/self/media/recent/?access_token=' + this.accessToken
-								+ '&count=' + NUM_IMAGES_TO_REQUEST
-								+ '&callback=?';
-			return true;
-		}
-	}
+        if(URL.hash === null || !URL.hash.includes('#access_token=')) {
+            // If no access token specified, redirect to instagram auth page
+            window.location = INSTAGRAM_AUTH_URL;
+            return false;
+        } else {
+            this.accessToken = URL.hash.split('=')[1];
+            this.nextPageUrl = 'https://api.instagram.com/v1/users/self/media/recent/?access_token=' + this.accessToken
+                                + '&count=' + NUM_IMAGES_TO_REQUEST
+                                + '&callback=?';
+            return true;
+        }
+    }
 
-	getProfileInfo() {
-		// Include 'callback' query parameter to force JSONP
-		const URL = 'https://api.instagram.com/v1/users/self/?access_token=' + this.accessToken
-					+ '&callback=?';
+    getProfileInfo() {
+        // Include 'callback' query parameter to force JSONP
+        const URL = 'https://api.instagram.com/v1/users/self/?access_token=' + this.accessToken
+                    + '&callback=?';
 
-		return new Promise( (resolve, reject) => {
-			$.getJSON(URL, (result, status) => {
-				if(status !== 'success') return reject(status);
+        return new Promise( (resolve, reject) => {
+            $.getJSON(URL, (result, status) => {
+                if(status !== 'success') return reject(status);
 
-				return resolve({
-					name : result.data.full_name,
-					profilePictureUrl : result.data.profile_picture
-				});
-			});
-		});
-	}
+                return resolve({
+                    name : result.data.full_name,
+                    profilePictureUrl : result.data.profile_picture
+                });
+            });
+        });
+    }
 
-	canLoadMoreImages() {
-		return this.nextPageUrl !== null;
-	}
+    canLoadMoreImages() {
+        return this.nextPageUrl !== null;
+    }
 
-	getImages() {
-		return new Promise( (resolve, reject) => {
-			$.getJSON(this.nextPageUrl, (results, status) => {
-				if(status !== 'success') return reject(status);
+    getImages() {
+        return new Promise( (resolve, reject) => {
+            $.getJSON(this.nextPageUrl, (results, status) => {
+                if(status !== 'success') return reject(status);
 
-				let imageArray = results.data.map( data => {
-					return {
-						image : {
-							standard : data.images.standard_resolution,
-							thumbnail : data.images.thumbnail
-						},
-						caption : data.caption ? data.caption.text : ""
-					}
-				});
+                let imageArray = results.data.map( data => {
+                    return {
+                        image : {
+                            standard : data.images.standard_resolution,
+                            thumbnail : data.images.thumbnail
+                        },
+                        caption : data.caption ? data.caption.text : ""
+                    }
+                });
 
-				let nextUrl = results.pagination.next_url || null;
+                let nextUrl = results.pagination.next_url || null;
 
-				// Remove the calculated callback name to avoid Access-Control-Allow-Origin
-				// errors.
-				if(nextUrl !== null) {
-					nextUrl = nextUrl.replace(/callback=(\w+)/, 'callback=?');
-				}
+                // Remove the calculated callback name to avoid Access-Control-Allow-Origin
+                // errors.
+                if(nextUrl !== null) {
+                    nextUrl = nextUrl.replace(/callback=(\w+)/, 'callback=?');
+                }
 
-				this.nextPageUrl = nextUrl;
+                this.nextPageUrl = nextUrl;
 
-				return resolve(imageArray);
-			});
-		});
-	}
+                return resolve(imageArray);
+            });
+        });
+    }
 }

@@ -1,25 +1,25 @@
 {
-  "name": "lightbox_jb",
-  "version": "1.0.0",
-  "description": "",
-  "main": "lightbox.js",
-  "scripts": {
-    "build-js": "browserify client/js/*.js -t [ babelify --presets [ env ] ] -o public/bundle.js",
-    "build-css": "cat client/css/*.css > public/bundle.css",
-    "build": "npm run build-js && npm run build-css",
-    "watch-js": "watchify client/js/*.js -t [ babelify --presets [ env ] ] -o public/bundle.js -dv",
-    "watch-css": "catw client/css/*.css -o public/bundle.css -v",
-    "watch": "npm run watch-js & npm run watch-css",
-    "serve-static": "static public -H '{\"Cache-Control\": \"no-cache, must-revalidate\"}'"
-  },
-  "author": "John Brian Kirby <jb@afternight.org> (http://nonagon.net)",
-  "license": "ISC",
-  "devDependencies": {
-    "babel-preset-env": "^1.1.4",
-    "babelify": "^7.3.0"
-  },
-  "dependencies": {
-    "jquery": "^3.1.1",
-    "url": "^0.11.0"
-  }
+    "name": "lightbox_jb",
+    "version": "1.0.0",
+    "description": "",
+    "main": "lightbox.js",
+    "scripts": {
+        "build-js": "browserify client/js/*.js -t [ babelify --presets [ env ] ] -o public/bundle.js",
+        "build-css": "cat client/css/*.css > public/bundle.css",
+        "build": "npm run build-js && npm run build-css",
+        "watch-js": "watchify client/js/*.js -t [ babelify --presets [ env ] ] -o public/bundle.js -dv",
+        "watch-css": "catw client/css/*.css -o public/bundle.css -v",
+        "watch": "npm run watch-js & npm run watch-css",
+        "serve-static": "static public -H '{\"Cache-Control\": \"no-cache, must-revalidate\"}'"
+    },
+    "author": "John Brian Kirby",
+    "license": "ISC",
+    "devDependencies": {
+        "babel-preset-env": "^1.1.4",
+        "babelify": "^7.3.0"
+    },
+    "dependencies": {
+        "jquery": "^3.1.1",
+        "url": "^0.11.0"
+    }
 }
