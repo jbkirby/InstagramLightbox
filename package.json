@@ -12,7 +12,7 @@
     "watch": "npm run watch-js & npm run watch-css",
     "serve-static": "static public -H '{\"Cache-Control\": \"no-cache, must-revalidate\"}'"
   },
-  "author": "John Brian Kirby <jb@afternight.org> (http://nonagon.net)",
+  "author": "John Brian Kirby",
   "license": "ISC",
   "devDependencies": {
     "babel-preset-env": "^1.1.4",
