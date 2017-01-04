@@ -1,15 +1,17 @@
 import $ from 'jquery';
 import url from 'url';
-import ImageSource from './ImageSource';
 
-// TODO move this to an environment variable
 const INSTAGRAM_CLIENT_ID = '54cf06a9c7fa4584b9008927c8721b41';
 
+// Set to 5 to demonstrate multiple API accesses.
 const NUM_IMAGES_TO_REQUEST = 5;
 
-export default class InstagramImageSource extends ImageSource {
+/**
+ * Encapsulates the Instagram API. Methods are generalized to allow straightforward
+ * implementation of compatible classes for other image APIs.
+ */
+export default class InstagramImageSource {
 	constructor() {
-		super();
 		this.accessToken = null;
 		this.nextPageUrl = null;
 	}
@@ -58,8 +60,6 @@ export default class InstagramImageSource extends ImageSource {
 		return new Promise( (resolve, reject) => {
 			$.getJSON(this.nextPageUrl, (results, status) => {
 				if(status !== 'success') return reject(status);
-
-				// console.log('raw result from IG: ' + JSON.stringify(results, null, 4));
 
 				let imageArray = results.data.map( data => {
 					return {

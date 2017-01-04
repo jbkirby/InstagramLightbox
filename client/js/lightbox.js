@@ -1,20 +1,30 @@
 import $ from 'jquery';
 import InstagramImageSource from './InstagramImageSource';
 
+// Interface to the underlying image API, in this case Instagram.
 let imageSource = new InstagramImageSource();
-let imageDataSoFar = [];
+
+// List of objects, each of which contains info on an image pulled from the global
+// imageSource.
+let imageInfo = [];
+
+// Index of the object in imageInfo corresponding to the currently-displayed image.
 let curImageIndex = -1;
 
 if(imageSource.authorize()) {
+	// NOTE we're not currently doing anything with the profile info we pull,
+	// so I've commented out the request, but left it here for reference.
 	Promise.all([
-		updateProfileInfo(),
+		// updateProfileInfo(),
 		loadMoreImageDescriptions()
 	]).then(() => {
+		// An initial batch of image descriptions has been loaded. Display our
+		// first photo (if one exists), and set up the UI.
 		showNextPhoto();
 		attachListeners();
 	});
 } else {
-	// TODO update page UI to indicate authorization failure
+	// TODO show something useful if authorization fails.
 	console.log('not authorized.');
 }
 
@@ -30,6 +40,7 @@ function attachListeners() {
 	});
 }
 
+// NOTE Currently not used
 function updateProfileInfo() {
 	return imageSource.getProfileInfo()
 	.then(result => {
@@ -38,32 +49,39 @@ function updateProfileInfo() {
 	});
 }
 
+// Hide or reveal nav buttons as appropriate.
 function updateNavButtons() {
 	$('#prev_link').toggleClass('hide', curImageIndex === 0);
-	$('#next_link').toggleClass('hide', curImageIndex >= imageDataSoFar.length - 1);
+	$('#next_link').toggleClass('hide', curImageIndex >= imageInfo.length - 1);
 }
 
+// Request another page of image descriptions from our image source. We're not
+// concerned with the number of images included per-page; we leave that up to
+// the specifics of the image source implementation and the source API.
 function loadMoreImageDescriptions() {
 	if(!imageSource.canLoadMoreImages()) return Promise.resolve();
 
-	console.log('loading more image data from API...');
+	// Grab another batch of image data from the image source
 	return imageSource.getImages()
 	.then(results =>{
-		imageDataSoFar = imageDataSoFar.concat(results);
+		imageInfo = imageInfo.concat(results);
 	});
 }
 
+// Displays the photo described at index (curImageIndex + 1) in imageInfo,
+// updates navigation buttons as needed, and pre-loads the next image (which might
+// involve pulling another page of image descriptions first).
 function showNextPhoto() {
 	Promise.resolve()
 	.then(() => {
-		if(curImageIndex < imageDataSoFar.length - 1) {
+		if(curImageIndex < imageInfo.length - 1) {
 			curImageIndex++;
 			showImage(curImageIndex);
 			updateNavButtons();
 		}
 
 		// If we have at least one more image in our cache, preload it
-		if(curImageIndex < imageDataSoFar.length - 2) {
+		if(curImageIndex < imageInfo.length - 2) {
 			preloadImage(curImageIndex + 1);
 		} else {
 			// ...otherwise, ask our ImageSource for more data
@@ -71,7 +89,9 @@ function showNextPhoto() {
 			.then(() => {
 				updateNavButtons();
 
-				if(curImageIndex < imageDataSoFar.length - 1) {
+				// Have to check our bounds again, as more image data may have
+				// been added to imageInfo.
+				if(curImageIndex < imageInfo.length - 1) {
 					preloadImage(curImageIndex + 1);
 				}
 			});
@@ -89,16 +109,15 @@ function showPrevPhoto() {
 }
 
 function showImage(index) {
-	$('#focus_image').attr('src', imageDataSoFar[index].image.standard.url);
-	$('#image_description').text(imageDataSoFar[index].caption);
+	$('#focus_image').attr('src', imageInfo[index].image.standard.url);
+	$('#image_description').text(imageInfo[index].caption);
 }
 
+// Load the image at the parameter index in imageInfo, but don't display it yet.
 function preloadImage(index) {
-	let imageDescription = imageDataSoFar[index];
+	let imageDescription = imageInfo[index];
 
-	// If we haven't already downloaded the image at index, do it now.
 	if(!imageDescription.image.standard.downloaded) {
-		console.log('preloading ' + index);
 		imageDescription.image.standard.downloaded = new Image();
 		imageDescription.image.standard.downloaded.src = imageDescription.image.standard.url;
 	}
