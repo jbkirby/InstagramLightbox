@@ -12,12 +12,13 @@ div.lightbox {
     margin-left: 50px;
     margin-right: 50px;
     position: relative;
+    max-width: 700px;
 }
 
 div.description_container {
-  text-align: center;
-  padding: 10px 20px;
-  min-height: 50px;
+    text-align: center;
+    padding: 10px 20px;
+    min-height: 50px;
 }
 
 div.nav_container {
@@ -25,15 +26,11 @@ div.nav_container {
     left: 0;
     top: 50%;
     width: 100%;
-    /*transform: translate(0, -50%);*/
+    max-width: 800px;
 }
 
 #focus_image {
     width: 100%;
-}
-
-.hide {
-   display: none;
 }
 
 div.nav_container a {
@@ -42,14 +39,6 @@ div.nav_container a {
     border-bottom:10px solid white;
     width:20px;
     height:20px;
-}
-
-div.centered_container {
-    height: 100px;
-    width: 100%;
-    border-style: solid;
-    border-width: 5px;
-    border-color: red;
 }
 
 #prev_link {
@@ -64,4 +53,8 @@ div.centered_container {
     border-right:10px solid white;
     margin-right: 20px;
     transform: rotate(-45deg);
+}
+
+.hide {
+   display: none;
 }
