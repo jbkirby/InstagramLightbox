@@ -1,6 +1,6 @@
 import url from 'url';
 
-const INSTAGRAM_CLIENT_ID = '54cf06a9c7fa4584b9008927c8721b41';
+const INSTAGRAM_CLIENT_ID = ''; // credentials from instagram go here.
 
 // NOTE Try setting to e.g. 5 to demonstrate multiple API accesses.
 const NUM_IMAGES_TO_REQUEST = 20;
